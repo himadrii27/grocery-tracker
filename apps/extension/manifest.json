@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "Grocery Tracker — Swiggy & Blinkit Sync",
+  "version": "0.2.0",
+  "description": "Sync your Swiggy Instamart and Blinkit orders to Grocery Tracker for AI-powered reorder suggestions.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "tabs",
+    "notifications",
+    "background"
+  ],
+  "host_permissions": [
+    "https://*.swiggy.com/*",
+    "https://blinkit.com/*",
+    "http://localhost:3000/*",
+    "http://localhost:3006/*",
+    "https://*.vercel.app/*"
+  ],
+  "externally_connectable": {
+    "matches": [
+      "http://localhost:3000/*",
+      "http://localhost:3006/*",
+      "https://*.vercel.app/*",
+      "https://grocery-tracker.app/*"
+    ]
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.swiggy.com/instamart/order-history*"],
+      "js": ["content-swiggy.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://blinkit.com/account/orders*"],
+      "js": ["content-blinkit-interceptor.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://blinkit.com/account/orders*"],
+      "js": ["content-blinkit.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Grocery Tracker"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["selectors.json"],
+      "matches": ["https://www.swiggy.com/*"]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "grocery-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "db:generate": "pnpm --filter @grocery-tracker/db generate",
+    "db:migrate": "pnpm --filter @grocery-tracker/db migrate:dev",
+    "db:push": "pnpm --filter @grocery-tracker/db db:push",
+    "db:studio": "pnpm --filter @grocery-tracker/db studio"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "playwright": "^1.58.2",
+    "tsx": "^4.21.0"
+  }
+}

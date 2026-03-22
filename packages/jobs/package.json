@@ -1,0 +1,20 @@
+{
+  "name": "@grocery-tracker/jobs",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@grocery-tracker/ai": "workspace:*",
+    "@grocery-tracker/db": "workspace:*",
+    "@grocery-tracker/shared": "workspace:*",
+    "inngest": "^3.0.0",
+    "resend": "^6.9.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.5.0"
+  }
+}

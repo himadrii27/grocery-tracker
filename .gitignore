@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+dist/
+.turbo/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Generated
+packages/db/src/generated/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code
+.claude/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Chrome Extension
+apps/extension/dist/
+apps/extension/.crx
+
+# Playwright / playwright-mcp
+playwright-report/
+test-results/
+.playwright/
+.playwright-mcp/
+playwright/.cache/
+
+# Tasks
+tasks/
+.tasks/

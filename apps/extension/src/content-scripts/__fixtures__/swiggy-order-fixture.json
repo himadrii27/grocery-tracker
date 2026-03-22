@@ -1,0 +1,77 @@
+{
+  "description": "Synthetic Swiggy Instamart order fixture for parser testing",
+  "instamartOrder": {
+    "ordersList": [
+      {
+        "order_id": "SWG-2024-001",
+        "ordered_time_ms": 1709280000000,
+        "order_total": 486,
+        "items": [
+          {
+            "name": "Amul Gold Full Cream Milk 500ml Pouch",
+            "quantity": 2,
+            "unit_size": 500,
+            "unit": "ml",
+            "price": 32,
+            "display_price": 32
+          },
+          {
+            "name": "Aashirvaad Whole Wheat Atta 5kg",
+            "quantity": 1,
+            "unit_size": 5000,
+            "unit": "g",
+            "price": 299,
+            "display_price": 299
+          },
+          {
+            "name": "Tata Salt Vacuum Evaporated Iodised 1kg",
+            "quantity": 2,
+            "unit_size": 1000,
+            "unit": "g",
+            "price": 24,
+            "display_price": 24
+          },
+          {
+            "name": "Fortune Sunflower Oil 1L",
+            "quantity": 1,
+            "unit_size": 1000,
+            "unit": "ml",
+            "price": 130,
+            "display_price": 130
+          }
+        ]
+      },
+      {
+        "order_id": "SWG-2024-002",
+        "ordered_time_ms": 1708070400000,
+        "order_total": 245,
+        "items": [
+          {
+            "name": "Amul Gold Full Cream Milk 500ml Pouch",
+            "quantity": 4,
+            "unit_size": 500,
+            "unit": "ml",
+            "price": 32,
+            "display_price": 32
+          },
+          {
+            "name": "Amul Butter 100g",
+            "quantity": 2,
+            "unit_size": 100,
+            "unit": "g",
+            "price": 58,
+            "display_price": 58
+          },
+          {
+            "name": "Britannia Good Day Butter Cookies 200g",
+            "quantity": 1,
+            "unit_size": 200,
+            "unit": "g",
+            "price": 45,
+            "display_price": 45
+          }
+        ]
+      }
+    ]
+  }
+}

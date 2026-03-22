@@ -1,0 +1,184 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────────────────────────
+
+enum Platform {
+  SWIGGY_INSTAMART
+  BLINKIT
+  ZEPTO
+}
+
+enum ItemCategory {
+  DAIRY
+  PRODUCE
+  GRAINS
+  BEVERAGES
+  SNACKS
+  PERSONAL_CARE
+  CLEANING
+  FROZEN
+  CONDIMENTS
+  OTHER
+}
+
+enum ReorderStatus {
+  PENDING
+  LINK_GENERATED
+  SKIPPED
+  FAILED
+}
+
+// ─── Models ─────────────────────────────────────────────────────────────────
+
+model User {
+  id             String   @id @default(cuid())
+  clerkId        String   @unique
+  email          String   @unique
+  extensionToken String?  @unique // long-lived random token for Chrome extension auth
+  householdSize  Int      @default(1)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  orders         Order[]
+  inventoryItems InventoryItem[]
+  preferences    UserPreference?
+  reorderRules   ReorderRule[]
+  reorderLogs    ReorderLog[]
+}
+
+model UserPreference {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  preferredPlatform  Platform @default(SWIGGY_INSTAMART)
+  autoReorderEnabled Boolean  @default(false)
+  notifyBeforeDays   Int      @default(2)
+}
+
+model Order {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  platform        Platform
+  platformOrderId String?
+  orderedAt       DateTime
+  totalAmountINR  Int?
+  rawPayload      Json?
+
+  lineItems OrderLineItem[]
+
+  @@index([userId, orderedAt])
+}
+
+model GroceryItem {
+  id             String       @id @default(cuid())
+  name           String
+  normalizedName String       @unique // e.g. "amul-milk-500ml"
+  category       ItemCategory @default(OTHER)
+  unitType       String // "ml" | "g" | "pieces" | "kg"
+  defaultPackSize Float
+
+  lineItems      OrderLineItem[]
+  inventoryItems InventoryItem[]
+  reorderRules   ReorderRule[]
+  predictions    ConsumptionPrediction[]
+  reorderLogs    ReorderLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderLineItem {
+  id    String @id @default(cuid())
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String
+
+  groceryItem   GroceryItem @relation(fields: [groceryItemId], references: [id])
+  groceryItemId String
+
+  quantityOrdered Int
+  unitSize        Float?
+  unitType        String?
+  priceINR        Int
+
+  @@index([groceryItemId])
+}
+
+model InventoryItem {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  groceryItemId String
+  groceryItem   GroceryItem @relation(fields: [groceryItemId], references: [id])
+
+  estimatedStockUnits Float
+  runoutPredictedAt   DateTime?
+  lastUpdatedAt       DateTime  @updatedAt
+
+  @@unique([userId, groceryItemId])
+  @@index([userId, runoutPredictedAt])
+}
+
+model ConsumptionPrediction {
+  id     String @id @default(cuid())
+  userId String
+
+  groceryItemId String
+  groceryItem   GroceryItem @relation(fields: [groceryItemId], references: [id])
+
+  avgDailyConsumption Float
+  predictedRunoutAt   DateTime
+  confidenceScore     Float
+  reasoning           String
+  contextFactors      Json?
+  generatedAt         DateTime @default(now())
+
+  @@index([userId, predictedRunoutAt])
+}
+
+model ReorderRule {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  groceryItemId String
+  groceryItem   GroceryItem @relation(fields: [groceryItemId], references: [id])
+
+  triggerDaysBefore Int      @default(2)
+  preferredPlatform Platform?
+  preferredQuantity Int      @default(1)
+  isActive          Boolean  @default(true)
+
+  @@unique([userId, groceryItemId])
+}
+
+model ReorderLog {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  groceryItemId   String
+  groceryItem     GroceryItem   @relation(fields: [groceryItemId], references: [id])
+  platform        Platform
+  quantityOrdered Int
+  deepLink        String
+  status          ReorderStatus @default(PENDING)
+  agentTrace      Json?
+  createdAt       DateTime      @default(now())
+
+  @@index([userId, createdAt])
+}

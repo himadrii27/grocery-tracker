@@ -1,0 +1,24 @@
+{
+  "name": "@grocery-tracker/ai",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./agents/reorder": "./src/agents/reorder-agent.ts"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@grocery-tracker/db": "workspace:*",
+    "@grocery-tracker/shared": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "scripts": {
+    "eval": "tsx src/evals/prediction-eval.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.5.0"
+  }
+}
