@@ -2,9 +2,12 @@
   "name": "@grocery-tracker/db",
   "version": "0.1.0",
   "private": true,
+  "prisma": {
+    "schema": "./prisma/schema.prisma"
+  },
   "scripts": {
-    "build": "prisma generate",
-    "generate": "prisma generate",
+    "build": "prisma generate --schema=./prisma/schema.prisma",
+    "generate": "prisma generate --schema=./prisma/schema.prisma",
     "migrate:dev": "prisma migrate dev",
     "db:push": "prisma db push",
     "studio": "prisma studio"
