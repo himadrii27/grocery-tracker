@@ -10,7 +10,7 @@ import type { ReorderAgentContext } from "@grocery-tracker/ai";
  */
 export const runoutAlertJob = inngest.createFunction(
   {
-    id: "runout-alert",
+    id: "runout_alert",
     name: "Runout Alert → Reorder Suggestion",
     concurrency: { limit: 10 },
   },

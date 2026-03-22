@@ -9,7 +9,7 @@ import { predictConsumption } from "@grocery-tracker/ai";
  */
 export const predictionRefreshJob = inngest.createFunction(
   {
-    id: "prediction-refresh",
+    id: "prediction_refresh",
     name: "Daily Prediction Refresh",
     concurrency: { limit: 5 }, // max 5 users in parallel
   },

@@ -1,7 +1,7 @@
 import { Inngest } from "inngest";
 
 export const inngest = new Inngest({
-  id: "grocery-tracker",
+  id: "grocery_tracker",
   name: "Grocery Tracker",
 });
 

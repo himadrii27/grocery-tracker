@@ -8,7 +8,7 @@ import { db } from "@grocery-tracker/db";
  * update runoutPredictedAt for every item the user owns.
  */
 export const postSyncPredictionsJob = inngest.createFunction(
-  { id: "post-sync-predictions", name: "Post-Sync Prediction Refresh" },
+  { id: "post_sync_predictions", name: "Post-Sync Prediction Refresh" },
   { event: "grocery/orders.synced" },
   async ({ event, step, logger }) => {
     const { userId } = event.data;

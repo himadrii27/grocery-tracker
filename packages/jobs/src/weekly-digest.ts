@@ -17,7 +17,7 @@ function escapeHtml(str: string): string {
  * Sends a summary of spending + low/critical items to every user.
  */
 export const weeklyDigestJob = inngest.createFunction(
-  { id: "weekly-digest", name: "Weekly Grocery Digest Email" },
+  { id: "weekly_digest", name: "Weekly Grocery Digest Email" },
   { cron: "30 2 * * 0" }, // Sunday 8am IST = 02:30 UTC
   async ({ step, logger }) => {
     const resendKey = process.env.RESEND_API_KEY;
