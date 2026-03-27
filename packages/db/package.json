@@ -6,6 +6,7 @@
     "schema": "./prisma/schema.prisma"
   },
   "scripts": {
+    "postinstall": "prisma generate --schema=./prisma/schema.prisma",
     "build": "prisma generate --schema=./prisma/schema.prisma",
     "generate": "prisma generate --schema=./prisma/schema.prisma",
     "migrate:dev": "prisma migrate dev",

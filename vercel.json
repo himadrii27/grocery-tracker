@@ -1,0 +1,6 @@
+{
+  "buildCommand": "pnpm --filter @grocery-tracker/db generate && pnpm --filter @grocery-tracker/web build",
+  "installCommand": "pnpm install",
+  "outputDirectory": "apps/web/.next",
+  "framework": "nextjs"
+}
