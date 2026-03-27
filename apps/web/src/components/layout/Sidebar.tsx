@@ -9,7 +9,10 @@ const NAV_ITEMS = [
   { href: "/inventory", label: "Inventory", icon: "📦" },
   { href: "/orders", label: "Orders", icon: "🧾" },
   { href: "/reorders", label: "Reorders", icon: "🔄" },
+  { href: "/predictions", label: "Predictions", icon: "🗓️" },
+  { href: "/shopping-list", label: "Shopping List", icon: "🛍️" },
   { href: "/settings", label: "Settings", icon: "⚙️" },
+  { href: "/onboarding", label: "Setup Guide", icon: "🧩" },
   { href: "/admin/evals", label: "Eval Metrics", icon: "🧪" },
 ];
 

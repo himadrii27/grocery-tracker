@@ -2,13 +2,16 @@ import { api } from "@/trpc/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SpendingChartWrapper as SpendingChart } from "@/components/charts/SpendingChartWrapper";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
+import { SyncReminderBanner } from "@/components/dashboard/SyncReminderBanner";
 import Link from "next/link";
 
 export default async function DashboardPage() {
-  const [inventory, reorders, spending] = await Promise.all([
+  const [inventory, reorders, spending, lastSyncedAt] = await Promise.all([
     api.inventory.list(),
     api.reorders.list({ status: "LINK_GENERATED", limit: 5 }),
     api.orders.spendingByCategory({ months: 6 }),
+    api.orders.lastSyncedAt(),
   ]);
 
   type InventoryItem = (typeof inventory)[number];
@@ -30,27 +33,14 @@ export default async function DashboardPage() {
         <p className="text-gray-500 mt-1">Your grocery stock at a glance</p>
       </div>
 
+      <SyncReminderBanner lastSyncedAt={lastSyncedAt} />
+
       {inventory.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-5xl mb-4">🛒</p>
-          <h2 className="text-xl font-semibold text-gray-900">No inventory yet</h2>
-          <p className="text-gray-500 mt-2 max-w-sm mx-auto">
-            Sync your Swiggy Instamart or Blinkit orders using the Chrome extension.
-          </p>
-          <div className="mt-6 inline-block text-left bg-gray-50 border border-gray-200 rounded-xl px-6 py-4 max-w-sm">
-            <p className="text-sm font-semibold text-gray-700 mb-3">How to sync:</p>
-            <ol className="space-y-2 text-sm text-gray-600">
-              <li>1. Click the 🛒 Grocery Tracker icon in Chrome toolbar</li>
-              <li>2. Click <strong>Connect Account</strong> if not connected</li>
-              <li>3. Click <strong>Sync from Swiggy</strong> or <strong>Sync from Blinkit</strong></li>
-              <li>4. Come back here — your inventory will appear</li>
-            </ol>
-          </div>
-        </div>
+        <OnboardingFlow />
       ) : (
         <>
           {/* Stats row */}
-          <div className="grid grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
             <Card>
               <CardContent className="p-5">
                 <p className="text-sm text-gray-500">Critical</p>
@@ -117,7 +107,7 @@ export default async function DashboardPage() {
               <h2 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
                 ⚠️ Running Low <Badge variant="low">{low.length}</Badge>
               </h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {low.slice(0, 6).map((item: InventoryItem) => (
                   <div key={item.id} className="flex items-center justify-between p-3 bg-amber-50 border border-amber-100 rounded-xl">
                     <p className="font-medium text-sm text-gray-900">{item.name}</p>
@@ -139,7 +129,7 @@ export default async function DashboardPage() {
                 </span>
               )}
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {inventory.map((item: InventoryItem) => (
                 <div key={item.id} className={`p-3 rounded-xl border ${
                   item.stockLevel === "critical" ? "bg-red-50 border-red-200" :

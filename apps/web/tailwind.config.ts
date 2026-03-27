@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      spacing: {
+        18: "4.5rem", // 72px — clears the 56px mobile top header with breathing room
+      },
       colors: {
         brand: {
           50: "#f0fdf4",
@@ -24,7 +27,20 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Hide scrollbars while keeping scroll functionality (used for tab pill rows on mobile)
+    function ({ addUtilities }: { addUtilities: (u: Record<string, Record<string, string>>) => void }) {
+      addUtilities({
+        ".scrollbar-none": {
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
+        },
+        ".scrollbar-none::-webkit-scrollbar": {
+          display: "none",
+        },
+      });
+    },
+  ],
 };
 
 export default config;

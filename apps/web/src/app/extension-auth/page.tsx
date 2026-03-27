@@ -52,7 +52,7 @@ function ExtensionAuthInner() {
           try {
             chromeRuntime.sendMessage!(
               extId,
-              { type: "GROCERY_TRACKER_AUTH", token },
+              { type: "GROCERY_TRACKER_AUTH", token, appUrl: window.location.origin },
               (res: unknown) => {
                 if (settled) return;
                 settled = true;

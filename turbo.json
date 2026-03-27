@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**", "src/generated/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "generated/**"]
     },
     "dev": {
       "cache": false,
@@ -18,7 +18,7 @@
       "outputs": []
     },
     "generate": {
-      "outputs": ["src/generated/**"]
+      "outputs": ["generated/**"]
     },
     "migrate:dev": {
       "cache": false

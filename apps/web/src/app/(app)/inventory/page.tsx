@@ -32,7 +32,7 @@ export default function InventoryPage() {
         <p className="text-gray-500 mt-1">All tracked grocery items</p>
       </div>
 
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
         {TABS.map((tab) => (
           <button
             key={tab.value}

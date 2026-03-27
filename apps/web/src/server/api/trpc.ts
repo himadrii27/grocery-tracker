@@ -3,27 +3,37 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { db } from "@grocery-tracker/db";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { cache } from "react";
 
-export async function createTRPCContext() {
-  const { userId: clerkId } = await auth();
+// cache() deduplicates this across all tRPC calls within a single request,
+// so a dashboard load with 4 parallel calls only hits the DB once.
+const getOrCreateUser = cache(async (clerkId: string) => {
+  const t0 = Date.now();
+  let user = await db.user.findUnique({ where: { clerkId } });
+  console.log(`[trpc] db.findUser ${Date.now() - t0}ms`);
 
-  let user = null;
-  if (clerkId) {
-    user = await db.user.findUnique({ where: { clerkId } });
-
-    // Auto-create user row if missing (e.g. webhook not yet configured)
-    if (!user) {
-      const clerkUser = await currentUser();
-      const email =
-        clerkUser?.emailAddresses?.[0]?.emailAddress ?? `${clerkId}@unknown`;
-      user = await db.user.upsert({
-        where: { clerkId },
-        update: {},
-        create: { clerkId, email },
-      });
-    }
+  if (!user) {
+    const t1 = Date.now();
+    const clerkUser = await currentUser();
+    console.log(`[trpc] currentUser() ${Date.now() - t1}ms`);
+    const email =
+      clerkUser?.emailAddresses?.[0]?.emailAddress ?? `${clerkId}@unknown`;
+    user = await db.user.upsert({
+      where: { clerkId },
+      update: {},
+      create: { clerkId, email },
+    });
   }
 
+  return user;
+});
+
+export async function createTRPCContext() {
+  const t0 = Date.now();
+  const { userId: clerkId } = await auth();
+  console.log(`[trpc] auth() ${Date.now() - t0}ms`);
+
+  const user = clerkId ? await getOrCreateUser(clerkId) : null;
   return { db, user };
 }
 

@@ -3,7 +3,7 @@
  * Handles auth token relay and message routing.
  */
 
-const APP_URL = "http://localhost:3006"; // Override via storage for prod
+const APP_URL = "http://localhost:3000"; // Override via storage for prod
 
 // ─── Message Types ────────────────────────────────────────────────────────────
 
@@ -147,9 +147,13 @@ chrome.runtime.onMessage.addListener(
 
 // The web app sends the token via postMessage → content script → service worker
 chrome.runtime.onMessageExternal.addListener(
-  (message: { type: string; token?: string }, _sender, sendResponse) => {
+  (message: { type: string; token?: string; appUrl?: string }, _sender, sendResponse) => {
     if (message.type === "GROCERY_TRACKER_AUTH" && message.token) {
-      setAuthToken(message.token)
+      const saves: Promise<void>[] = [setAuthToken(message.token)];
+      if (message.appUrl) {
+        saves.push(chrome.storage.local.set({ appUrl: message.appUrl }));
+      }
+      Promise.all(saves)
         .then(() => sendResponse({ success: true }))
         .catch(() => sendResponse({ success: false }));
       return true;

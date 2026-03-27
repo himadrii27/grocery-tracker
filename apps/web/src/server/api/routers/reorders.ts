@@ -40,8 +40,46 @@ export const reordersRouter = createTRPCRouter({
     }),
 
   getSettings: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.userPreference.findUnique({
-      where: { userId: ctx.user.id },
-    });
+    const [prefs, user] = await Promise.all([
+      ctx.db.userPreference.findUnique({ where: { userId: ctx.user.id } }),
+      ctx.db.user.findUnique({
+        where: { id: ctx.user.id },
+        select: { householdSize: true },
+      }),
+    ]);
+    return {
+      householdSize: user?.householdSize ?? 1,
+      notifyBeforeDays: prefs?.notifyBeforeDays ?? 2,
+      preferredPlatform: prefs?.preferredPlatform ?? "SWIGGY_INSTAMART",
+    };
   }),
+
+  saveSettings: protectedProcedure
+    .input(
+      z.object({
+        householdSize: z.number().min(1).max(8),
+        notifyBeforeDays: z.number().min(1).max(7),
+        preferredPlatform: z.enum(["SWIGGY_INSTAMART", "BLINKIT", "ZEPTO"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await Promise.all([
+        ctx.db.user.update({
+          where: { id: ctx.user.id },
+          data: { householdSize: input.householdSize },
+        }),
+        ctx.db.userPreference.upsert({
+          where: { userId: ctx.user.id },
+          update: {
+            notifyBeforeDays: input.notifyBeforeDays,
+            preferredPlatform: input.preferredPlatform,
+          },
+          create: {
+            userId: ctx.user.id,
+            notifyBeforeDays: input.notifyBeforeDays,
+            preferredPlatform: input.preferredPlatform,
+          },
+        }),
+      ]);
+    }),
 });

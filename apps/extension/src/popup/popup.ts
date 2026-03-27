@@ -3,7 +3,7 @@
  * Handles sync trigger + auth connect flow
  */
 
-const APP_URL = "http://localhost:3006";
+const APP_URL = "http://localhost:3000";
 
 const statusEl = document.getElementById("status")!;
 const lastSyncedEl = document.getElementById("last-synced")!;
@@ -101,7 +101,10 @@ syncBlinkitBtn.addEventListener("click", () => void triggerSync("blinkit"));
 
 connectBtn.addEventListener("click", () => {
   const extId = chrome.runtime.id;
-  void chrome.tabs.create({ url: `${APP_URL}/extension-auth?extId=${extId}` });
+  void chrome.storage.local.get("appUrl").then(({ appUrl }) => {
+    const base = (appUrl as string | undefined) ?? APP_URL;
+    void chrome.tabs.create({ url: `${base}/extension-auth?extId=${extId}` });
+  });
 });
 
 void init();

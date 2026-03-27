@@ -1,18 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "@/trpc/client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {
+  const utils = api.useUtils();
   const { data: prefs } = api.reorders.getSettings.useQuery();
   const [householdSize, setHouseholdSize] = useState(1);
+  const [notifyBeforeDays, setNotifyBeforeDays] = useState(2);
+  const [preferredPlatform, setPreferredPlatform] = useState<"SWIGGY_INSTAMART" | "BLINKIT" | "ZEPTO">("SWIGGY_INSTAMART");
   const [saved, setSaved] = useState(false);
 
+  useEffect(() => {
+    if (prefs) {
+      setHouseholdSize(prefs.householdSize);
+      setNotifyBeforeDays(prefs.notifyBeforeDays);
+      setPreferredPlatform(prefs.preferredPlatform as "SWIGGY_INSTAMART" | "BLINKIT" | "ZEPTO");
+    }
+  }, [prefs]);
+
+  const saveMutation = api.reorders.saveSettings.useMutation({
+    onSuccess: () => {
+      void utils.reorders.getSettings.invalidate();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    },
+  });
+
   function handleSave() {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    saveMutation.mutate({ householdSize, notifyBeforeDays, preferredPlatform });
   }
 
   return (
@@ -56,7 +74,8 @@ export default function SettingsPage() {
                   Notify before runout (days)
                 </label>
                 <select
-                  defaultValue={prefs?.notifyBeforeDays ?? 2}
+                  value={notifyBeforeDays}
+                  onChange={(e) => setNotifyBeforeDays(Number(e.target.value))}
                   className="block w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
                   {[1, 2, 3, 5, 7].map((n) => (
@@ -67,6 +86,26 @@ export default function SettingsPage() {
                 </select>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <h2 className="font-semibold text-gray-900">Preferred Platform</h2>
+          </CardHeader>
+          <CardContent>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Default reorder platform
+            </label>
+            <select
+              value={preferredPlatform}
+              onChange={(e) => setPreferredPlatform(e.target.value as "SWIGGY_INSTAMART" | "BLINKIT" | "ZEPTO")}
+              className="block w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            >
+              <option value="SWIGGY_INSTAMART">Swiggy Instamart</option>
+              <option value="BLINKIT">Blinkit</option>
+              <option value="ZEPTO">Zepto</option>
+            </select>
           </CardContent>
         </Card>
 
@@ -87,8 +126,16 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Button onClick={handleSave} className="w-full max-w-xs">
-          {saved ? "Saved! ✓" : "Save Settings"}
+        {saveMutation.isError && (
+          <p className="text-sm text-red-600">Failed to save settings. Please try again.</p>
+        )}
+
+        <Button
+          onClick={handleSave}
+          disabled={saveMutation.isPending}
+          className="w-full max-w-xs"
+        >
+          {saveMutation.isPending ? "Saving…" : saved ? "Saved! ✓" : "Save Settings"}
         </Button>
       </div>
     </div>

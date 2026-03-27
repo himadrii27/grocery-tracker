@@ -41,6 +41,15 @@ export const ordersRouter = createTRPCRouter({
       });
     }),
 
+  lastSyncedAt: protectedProcedure.query(async ({ ctx }) => {
+    const latest = await ctx.db.order.findFirst({
+      where: { userId: ctx.user.id },
+      orderBy: { orderedAt: "desc" },
+      select: { orderedAt: true },
+    });
+    return latest?.orderedAt ?? null;
+  }),
+
   spendingByCategory: protectedProcedure
     .input(z.object({ months: z.number().min(1).max(12).default(6) }))
     .query(async ({ ctx, input }) => {

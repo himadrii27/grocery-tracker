@@ -5,12 +5,11 @@
  * and uses category-appropriate shelf-life estimates for consumables.
  */
 
-process.env.DATABASE_URL =
-  "postgresql://postgres.oyusfdmsnodnkbeebcqe:xnXGSkmsnkS81g8t@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true";
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL env var is required. Copy packages/db/.env.example and set it.");
+}
 
-const { PrismaClient } = await import(
-  "../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/default.js"
-);
+const { PrismaClient } = await import("../generated/client/default.js");
 
 const db = new PrismaClient();
 

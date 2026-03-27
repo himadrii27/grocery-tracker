@@ -11,6 +11,12 @@ const syncRateMap = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(token: string): boolean {
   const now = Date.now();
+  // Purge expired entries to prevent unbounded memory growth
+  if (syncRateMap.size > 500) {
+    for (const [k, v] of syncRateMap) {
+      if (now > v.resetAt) syncRateMap.delete(k);
+    }
+  }
   const entry = syncRateMap.get(token);
   if (!entry || now > entry.resetAt) {
     syncRateMap.set(token, { count: 1, resetAt: now + 60_000 });
