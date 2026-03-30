@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd ../.. && pnpm --filter @grocery-tracker/db db:push && pnpm --filter @grocery-tracker/db generate && pnpm --filter @grocery-tracker/web build",
-  "installCommand": "cd ../.. && ENABLE_EXPERIMENTAL_COREPACK=1 pnpm install",
-  "outputDirectory": ".next",
-  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- apps/web packages"
-}
