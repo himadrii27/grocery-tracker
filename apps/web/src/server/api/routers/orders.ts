@@ -44,10 +44,10 @@ export const ordersRouter = createTRPCRouter({
   lastSyncedAt: protectedProcedure.query(async ({ ctx }) => {
     const latest = await ctx.db.order.findFirst({
       where: { userId: ctx.user.id },
-      orderBy: { orderedAt: "desc" },
-      select: { orderedAt: true },
+      orderBy: { createdAt: "desc" },
+      select: { createdAt: true },
     });
-    return latest?.orderedAt ?? null;
+    return latest?.createdAt ?? null;
   }),
 
   spendingByCategory: protectedProcedure

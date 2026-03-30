@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 // Steps the user must complete before seeing their dashboard.
 // Steps 1 & 2 are manually acknowledged (we can't detect extension install from the page).
@@ -41,6 +42,8 @@ function saveDoneSteps(steps: Set<StepId>) {
 }
 
 export function OnboardingFlow() {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [doneSteps, setDoneSteps] = useState<Set<StepId>>(new Set());
   const [openStep, setOpenStep] = useState<StepId>("install");
   const [hydrated, setHydrated] = useState(false);
@@ -58,6 +61,10 @@ export function OnboardingFlow() {
       }
     }
   }, []);
+
+  const checkAndRefresh = useCallback(() => {
+    startTransition(() => router.refresh());
+  }, [router, startTransition]);
 
   function markDone(stepId: StepId) {
     const next = new Set(doneSteps);
@@ -227,10 +234,17 @@ export function OnboardingFlow() {
       {allDone && (
         <div className="mt-6 text-center bg-brand-50 border border-brand-200 rounded-2xl p-6">
           <p className="text-3xl mb-2">🎉</p>
-          <p className="font-semibold text-brand-800">All set! Waiting for your first sync...</p>
-          <p className="text-sm text-brand-700 mt-1">
-            Your dashboard will populate automatically once the extension sends your orders.
+          <p className="font-semibold text-brand-800">All set! Ready to view your dashboard.</p>
+          <p className="text-sm text-brand-700 mt-1 mb-4">
+            If you&apos;ve already synced your orders, click below to load your inventory.
           </p>
+          <button
+            onClick={checkAndRefresh}
+            disabled={isPending}
+            className="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-colors"
+          >
+            {isPending ? "Loading..." : "Show My Dashboard →"}
+          </button>
         </div>
       )}
     </div>

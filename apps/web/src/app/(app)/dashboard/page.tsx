@@ -7,12 +7,25 @@ import { SyncReminderBanner } from "@/components/dashboard/SyncReminderBanner";
 import Link from "next/link";
 
 export default async function DashboardPage() {
-  const [inventory, reorders, spending, lastSyncedAt] = await Promise.all([
+  let [inventory, reorders, spending, lastSyncedAt] = await Promise.all([
     api.inventory.list(),
     api.reorders.list({ status: "LINK_GENERATED", limit: 5 }),
     api.orders.spendingByCategory({ months: 6 }),
     api.orders.lastSyncedAt(),
   ]);
+
+  // Orders exist but inventory is empty — rebuild from order history
+  if (inventory.length === 0 && lastSyncedAt !== null) {
+    await api.inventory.rebuild();
+    inventory = await api.inventory.list();
+  }
+
+  // Inventory exists but no predictions yet — run heuristics now
+  const allUnknown = inventory.length > 0 && inventory.every((i) => i.stockLevel === "unknown");
+  if (allUnknown) {
+    await api.inventory.predict();
+    inventory = await api.inventory.list();
+  }
 
   type InventoryItem = (typeof inventory)[number];
   const critical = inventory.filter((i: InventoryItem) => i.stockLevel === "critical");
@@ -123,9 +136,9 @@ export default async function DashboardPage() {
             <h2 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
               📦 All Tracked Items
               <span className="text-sm font-normal text-gray-400">({inventory.length})</span>
-              {unknown.length > 0 && (
+              {unknown.filter((i: InventoryItem) => !i.isNonConsumable).length > 0 && (
                 <span className="text-xs text-gray-400 ml-auto">
-                  {unknown.length} item{unknown.length !== 1 ? "s" : ""} pending prediction
+                  {unknown.filter((i: InventoryItem) => !i.isNonConsumable).length} item{unknown.filter((i: InventoryItem) => !i.isNonConsumable).length !== 1 ? "s" : ""} pending prediction
                 </span>
               )}
             </h2>
@@ -153,6 +166,10 @@ export default async function DashboardPage() {
                         }`}>
                           {item.daysUntilRunout <= 0 ? "Out of stock" : `~${item.daysUntilRunout}d left`}
                         </p>
+                      ) : item.isNonConsumable ? (
+                        <span className="inline-block mt-1 text-xs px-1.5 py-0.5 rounded bg-gray-200 text-gray-500 font-medium">
+                          Non-consumable
+                        </span>
                       ) : (
                         <p className="text-xs mt-1 text-gray-400">Estimating…</p>
                       )}

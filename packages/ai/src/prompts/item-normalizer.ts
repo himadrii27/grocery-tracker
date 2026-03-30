@@ -11,7 +11,7 @@ ${itemsList}
 
 For each item, determine:
 1. A stable slug (e.g., "amul-toned-milk-500ml") — lowercase, hyphen-separated, includes brand + variant + size
-2. Category (DAIRY, PRODUCE, GRAINS, BEVERAGES, SNACKS, PERSONAL_CARE, CLEANING, FROZEN, CONDIMENTS, OTHER)
+2. Category (DAIRY, PRODUCE, GRAINS, BEVERAGES, SNACKS, PERSONAL_CARE, CLEANING, FROZEN, CONDIMENTS, OTHER, NON_CONSUMABLE)
 3. Unit type (ml, g, pieces, kg)
 4. Default pack size in that unit
 5. Confidence in your categorization (high/medium/low)
@@ -20,6 +20,7 @@ Rules:
 - Always include size in the slug if it's part of the product identity
 - For produce/unbranded items, omit brand (e.g., "banana-dozen" not "big-bazaar-banana")
 - Prefer the most common Indian brand name spelling
+- Use NON_CONSUMABLE for items that don't get consumed/run out: clothing, apparel, footwear, electronics, accessories, toys, home décor, utensils, books, stationery
 
 Use the normalize_items tool to submit all normalizations as an array.`;
 }
@@ -47,6 +48,7 @@ export const normalizeItemsJsonSchema = {
               "FROZEN",
               "CONDIMENTS",
               "OTHER",
+              "NON_CONSUMABLE",
             ],
           },
           unitType: { type: "string", enum: ["ml", "g", "pieces", "kg"] },

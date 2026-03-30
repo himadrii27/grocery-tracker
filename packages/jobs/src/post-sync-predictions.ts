@@ -51,7 +51,7 @@ const SHELF_LIFE: Record<string, number | null> = {
   OTHER:         null,
 };
 
-async function runHeuristicPredictions(userId: string) {
+export async function runHeuristicPredictions(userId: string) {
   const items = await db.inventoryItem.findMany({
     where: { userId },
     include: { groceryItem: true },

@@ -32,6 +32,7 @@ enum ItemCategory {
   FROZEN
   CONDIMENTS
   OTHER
+  NON_CONSUMABLE
 }
 
 enum ReorderStatus {
@@ -79,10 +80,12 @@ model Order {
   orderedAt       DateTime
   totalAmountINR  Int?
   rawPayload      Json?
+  createdAt       DateTime @default(now())
 
   lineItems OrderLineItem[]
 
   @@index([userId, orderedAt])
+  @@index([userId, createdAt])
 }
 
 model GroceryItem {

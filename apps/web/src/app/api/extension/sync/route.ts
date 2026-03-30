@@ -119,6 +119,7 @@ export async function POST(req: Request) {
   for (const order of newOrders) {
     const lineItemsData: Array<{
       groceryItemId: string;
+      category: string;
       quantityOrdered: number;
       unitSize?: number;
       unitType?: string;
@@ -143,6 +144,7 @@ export async function POST(req: Request) {
 
       lineItemsData.push({
         groceryItemId: groceryItem.id,
+        category: normalized.category,
         quantityOrdered: li.quantity,
         unitSize: li.unitSize,
         unitType: li.unitType,
@@ -159,12 +161,15 @@ export async function POST(req: Request) {
           orderedAt: order.orderedAt,
           totalAmountINR: order.totalAmountINR,
           rawPayload: order as object,
-          lineItems: { create: lineItemsData },
+          lineItems: {
+            create: lineItemsData.map(({ category: _cat, ...li }) => li),
+          },
         },
       });
 
-      // Update inventory estimates
+      // Update inventory estimates (skip non-consumables like clothing)
       for (const li of lineItemsData) {
+        if (li.category === "NON_CONSUMABLE") continue;
         await db.inventoryItem.upsert({
           where: {
             userId_groceryItemId: {
